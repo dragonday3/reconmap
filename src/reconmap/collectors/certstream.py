@@ -9,8 +9,6 @@ from reconmap.models.asset import AssetSnapshot, Subdomain
 
 logger = logging.getLogger(__name__)
 
-CRTSH_URL = "https://crt.sh/?q=%.{domain}&output=json"
-
 
 class CertStreamCollector(BaseCollector):
     name = "certstream"
@@ -26,7 +24,11 @@ class CertStreamCollector(BaseCollector):
                         "crt.sh returned %s for %s", response.status_code, domain
                     )
                     return AssetSnapshot(target_domain=domain)
-                data = response.json()
+                try:
+                    data = response.json()
+                except Exception as exc:
+                    logger.warning("crt.sh JSON parse error for %s: %s", domain, exc)
+                    return AssetSnapshot(target_domain=domain)
         except httpx.TimeoutException:
             logger.warning("crt.sh timeout for %s", domain)
             return AssetSnapshot(target_domain=domain)
@@ -43,7 +45,8 @@ class CertStreamCollector(BaseCollector):
                 dt = dateutil_parser.parse(raw_not_before)
                 if dt.tzinfo is None:
                     dt = dt.replace(tzinfo=timezone.utc)
-            except Exception:
+            except Exception as exc:
+                logger.debug("Failed to parse date %r: %s", raw_not_before, exc)
                 dt = datetime.now(timezone.utc)
 
             for name in entry.get("name_value", "").split("\n"):
@@ -64,7 +67,7 @@ class CertStreamCollector(BaseCollector):
             Subdomain(
                 target_domain=domain,
                 subdomain=name,
-                source="certstream",
+                source=self.name,
                 first_seen=first_seen,
                 last_seen=last_seen,
             )

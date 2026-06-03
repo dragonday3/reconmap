@@ -13,5 +13,7 @@ class BaseCollector(ABC):
         ...
 
     def is_available(self) -> bool:
-        """Return False if requires_key=True and key not configured."""
+        """Return False if requires_key=True and no key configured in subclass."""
+        if self.requires_key:
+            return False
         return True
