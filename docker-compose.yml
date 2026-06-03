@@ -1,0 +1,14 @@
+version: "3.9"
+
+services:
+  reconmap:
+    build: .
+    environment:
+      - RECONMAP_SHODAN_KEY=${RECONMAP_SHODAN_KEY:-}
+      - RECONMAP_GITHUB_TOKEN=${RECONMAP_GITHUB_TOKEN:-}
+      - DATABASE_URL=sqlite+aiosqlite:///./data/reconmap.db
+    volumes:
+      - ./data:/app/data
+    ports:
+      - "8000:8000"
+    command: serve --host 0.0.0.0 --port 8000
