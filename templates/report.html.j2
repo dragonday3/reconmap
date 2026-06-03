@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>reconmap — {{ snapshot.target_domain }}</title>
+<style>
+:root {
+  --bg: #0d1117; --card: #161b22; --border: #30363d;
+  --text: #c9d1d9; --muted: #8b949e; --accent: #58a6ff;
+  --critical: #f85149; --high: #ff7b72; --medium: #e3b341;
+  --low: #3fb950; --info: #58a6ff;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: -apple-system, monospace; padding: 2rem; }
+h1 { color: var(--accent); margin-bottom: 0.25rem; }
+.meta { color: var(--muted); font-size: 0.85rem; margin-bottom: 2rem; }
+.cards { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 2rem; }
+.card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem 1.5rem; min-width: 140px; }
+.card-num { font-size: 2rem; font-weight: bold; }
+.card-label { color: var(--muted); font-size: 0.8rem; margin-top: 0.25rem; }
+.section { margin-bottom: 2rem; }
+.section h2 { font-size: 1rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.75rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); }
+table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+th { text-align: left; color: var(--muted); font-weight: 500; padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--border); }
+td { padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--border); word-break: break-all; }
+tr:last-child td { border-bottom: none; }
+.badge { display: inline-block; padding: 0.15rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; }
+.badge-critical { background: rgba(248,81,73,0.2); color: var(--critical); }
+.badge-high { background: rgba(255,123,114,0.2); color: var(--high); }
+.badge-medium { background: rgba(227,179,65,0.2); color: var(--medium); }
+.badge-low { background: rgba(63,185,80,0.2); color: var(--low); }
+.badge-info { background: rgba(88,166,255,0.15); color: var(--info); }
+code { background: var(--card); border: 1px solid var(--border); border-radius: 3px; padding: 0.1rem 0.4rem; font-size: 0.8rem; }
+.empty { color: var(--muted); font-style: italic; padding: 1rem 0; }
+</style>
+</head>
+<body>
+<h1>reconmap</h1>
+<div class="meta">Target: <strong>{{ snapshot.target_domain }}</strong> &nbsp;·&nbsp; Snapshot: <code>{{ snapshot.snapshot_id[:8] }}</code> &nbsp;·&nbsp; {{ snapshot.timestamp }}</div>
+
+<div class="cards">
+  <div class="card"><div class="card-num">{{ total_subdomains }}</div><div class="card-label">Subdomains</div></div>
+  <div class="card"><div class="card-num">{{ total_ports }}</div><div class="card-label">Open Ports</div></div>
+  <div class="card"><div class="card-num" style="color:var(--critical)">{{ total_leaks }}</div><div class="card-label">Secret Leaks</div></div>
+  <div class="card"><div class="card-num">{{ total_changes }}</div><div class="card-label">Changes</div></div>
+</div>
+
+{% if snapshot.subdomains %}
+<div class="section">
+  <h2>Subdomains ({{ total_subdomains }})</h2>
+  <table>
+    <tr><th>Subdomain</th><th>IP Addresses</th><th>Source</th><th>First Seen</th></tr>
+    {% for sub in snapshot.subdomains %}
+    <tr>
+      <td><code>{{ sub.subdomain }}</code></td>
+      <td>{{ sub.ip_addresses | join(", ") or "—" }}</td>
+      <td>{{ sub.source }}</td>
+      <td>{{ sub.first_seen }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+{% endif %}
+
+{% if snapshot.ports %}
+<div class="section">
+  <h2>Open Ports ({{ total_ports }})</h2>
+  <table>
+    <tr><th>IP</th><th>Port</th><th>Service</th><th>Protocol</th></tr>
+    {% for port in snapshot.ports %}
+    <tr>
+      <td><code>{{ port.ip }}</code></td>
+      <td>{{ port.port }}</td>
+      <td>{{ port.service or "—" }}</td>
+      <td>{{ port.protocol }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+{% endif %}
+
+{% if snapshot.leaks %}
+<div class="section">
+  <h2>Secret Leaks ({{ total_leaks }})</h2>
+  <table>
+    <tr><th>Type</th><th>Repo</th><th>File</th><th>Match (redacted)</th></tr>
+    {% for leak in snapshot.leaks %}
+    <tr>
+      <td><span class="badge badge-critical">{{ leak.secret_type }}</span></td>
+      <td><code>{{ leak.repo }}</code></td>
+      <td>{{ leak.file_path }}</td>
+      <td><code>{{ leak.raw_match }}</code></td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+{% endif %}
+
+{% if changes %}
+<div class="section">
+  <h2>Changes ({{ total_changes }})</h2>
+  <table>
+    <tr><th>Severity</th><th>Type</th><th>Asset</th><th>Details</th></tr>
+    {% for change in changes %}
+    <tr>
+      <td><span class="badge badge-{{ change.severity }}">{{ change.severity }}</span></td>
+      <td>{{ change.change_type }}</td>
+      <td><code>{{ change.asset_key }}</code></td>
+      <td>{{ change.details }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+{% endif %}
+
+{% if not snapshot.subdomains and not snapshot.ports and not snapshot.leaks %}
+<p class="empty">No assets discovered.</p>
+{% endif %}
+
+</body>
+</html>
