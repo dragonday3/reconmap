@@ -1,5 +1,5 @@
-from datetime import datetime
-from typing import Literal
+from datetime import datetime, timezone
+from typing import Any, Literal
 import uuid
 
 from pydantic import BaseModel, Field
@@ -8,7 +8,7 @@ from pydantic import BaseModel, Field
 class TargetDomain(BaseModel):
     domain: str
     tags: list[str] = Field(default_factory=list)
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
 class Subdomain(BaseModel):
@@ -16,14 +16,14 @@ class Subdomain(BaseModel):
     subdomain: str
     ip_addresses: list[str] = Field(default_factory=list)
     source: str
-    first_seen: datetime = Field(default_factory=datetime.utcnow)
-    last_seen: datetime = Field(default_factory=datetime.utcnow)
+    first_seen: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    last_seen: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
 class Port(BaseModel):
     ip: str
     port: int
-    protocol: str = "tcp"
+    protocol: Literal["tcp", "udp"] = "tcp"
     service: str = ""
     banner: str = ""
     source: str
@@ -43,7 +43,7 @@ class SecretLeak(BaseModel):
 class AssetSnapshot(BaseModel):
     target_domain: str
     snapshot_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     subdomains: list[Subdomain] = Field(default_factory=list)
     ports: list[Port] = Field(default_factory=list)
     leaks: list[SecretLeak] = Field(default_factory=list)
@@ -62,9 +62,9 @@ ChangeType = Literal[
 class Change(BaseModel):
     target_domain: str
     snapshot_id: str
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     change_type: ChangeType
     severity: SeverityLevel
     asset_type: str
     asset_key: str
-    details: dict = Field(default_factory=dict)
+    details: dict[str, Any] = Field(default_factory=dict)
