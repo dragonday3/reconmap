@@ -1,6 +1,6 @@
 # reconmap
 
-[![CI](https://github.com/your-org/reconmap/actions/workflows/ci.yml/badge.svg)](https://github.com/your-org/reconmap/actions/workflows/ci.yml)
+[![CI](https://github.com/dragonday3/reconmap/actions/workflows/ci.yml/badge.svg)](https://github.com/dragonday3/reconmap/actions/workflows/ci.yml)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
@@ -19,7 +19,7 @@ pip install reconmap
 ### From source
 
 ```bash
-git clone https://github.com/your-org/reconmap.git
+git clone https://github.com/dragonday3/reconmap.git
 cd reconmap
 pip install -e ".[dev]"
 ```
@@ -27,7 +27,7 @@ pip install -e ".[dev]"
 ### Docker
 
 ```bash
-docker pull your-org/reconmap:latest
+docker pull dragonday3/reconmap:latest
 # or build locally
 docker build -t reconmap .
 ```
@@ -258,7 +258,7 @@ All data collection is **passive** — no active probing or port scanning is per
 
 ```bash
 # Clone and install in editable mode with dev dependencies
-git clone https://github.com/your-org/reconmap.git
+git clone https://github.com/dragonday3/reconmap.git
 cd reconmap
 pip install -e ".[dev]"
 
