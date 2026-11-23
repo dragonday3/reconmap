@@ -22,7 +22,7 @@ pytest tests/ -q
 pytest --cov=reconmap --cov-report=term-missing tests/
 
 # Specific module
-pytest tests/test_certstream.py -v
+pytest tests/test_crtsh.py -v
 ```
 
 All PRs must keep the test suite green across Python 3.10, 3.11, and 3.12.

@@ -25,7 +25,7 @@ def _make_answer(ip: str):
     return answer
 
 
-def _make_existing_subdomain(domain: str, subdomain: str, source: str = "certstream", ips: list[str] | None = None) -> Subdomain:
+def _make_existing_subdomain(domain: str, subdomain: str, source: str = "crtsh", ips: list[str] | None = None) -> Subdomain:
     now = datetime.now(timezone.utc)
     return Subdomain(
         target_domain=domain,
@@ -44,7 +44,7 @@ def _make_existing_subdomain(domain: str, subdomain: str, source: str = "certstr
 async def test_resolves_known_subdomain_ip_populated():
     answer = _make_answer("1.2.3.4")
     with patch("dns.asyncresolver.resolve", new=AsyncMock(return_value=answer)):
-        sub = _make_existing_subdomain("example.com", "mail.example.com", source="certstream")
+        sub = _make_existing_subdomain("example.com", "mail.example.com", source="crtsh")
         collector = DNSResolverCollector()
         snapshot = await collector.collect("example.com", existing_subdomains=[sub])
 
@@ -62,7 +62,7 @@ async def test_nxdomain_ip_addresses_stay_empty():
         "dns.asyncresolver.resolve",
         new=AsyncMock(side_effect=dns.exception.DNSException("NXDOMAIN")),
     ):
-        sub = _make_existing_subdomain("example.com", "mail.example.com", source="certstream")
+        sub = _make_existing_subdomain("example.com", "mail.example.com", source="crtsh")
         collector = DNSResolverCollector()
         snapshot = await collector.collect("example.com", existing_subdomains=[sub])
 
@@ -80,7 +80,7 @@ async def test_timeout_ip_addresses_stay_empty():
         "dns.asyncresolver.resolve",
         new=AsyncMock(side_effect=asyncio.TimeoutError()),
     ):
-        sub = _make_existing_subdomain("example.com", "api.example.com", source="certstream")
+        sub = _make_existing_subdomain("example.com", "api.example.com", source="crtsh")
         collector = DNSResolverCollector()
         snapshot = await collector.collect("example.com", existing_subdomains=[sub])
 
@@ -157,7 +157,7 @@ async def test_existing_subdomain_resolves_ips_updated_source_unchanged():
         raise dns.exception.DNSException("NXDOMAIN")
 
     with patch("dns.asyncresolver.resolve", new=AsyncMock(side_effect=resolve_side_effect)):
-        sub = _make_existing_subdomain("example.com", "api.example.com", source="certstream", ips=[])
+        sub = _make_existing_subdomain("example.com", "api.example.com", source="crtsh", ips=[])
         collector = DNSResolverCollector()
         snapshot = await collector.collect("example.com", existing_subdomains=[sub])
 
@@ -166,7 +166,7 @@ async def test_existing_subdomain_resolves_ips_updated_source_unchanged():
     found = subdomain_map["api.example.com"]
     assert "9.9.9.9" in found.ip_addresses
     # source must NOT be changed to "dns"
-    assert found.source == "certstream"
+    assert found.source == "crtsh"
 
 
 # ---------------------------------------------------------------------------

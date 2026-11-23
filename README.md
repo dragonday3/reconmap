@@ -207,7 +207,7 @@ Interactive docs available at `http://localhost:8000/docs`.
 ```
 reconmap
 ├── collectors/          Data-source adapters (passive only)
-│   ├── certstream.py    Certificate Transparency logs (crt.sh query)
+│   ├── crtsh.py         Certificate Transparency logs (crt.sh query)
 │   ├── shodan.py        Shodan InternetDB open ports (free, no key)
 │   ├── github.py        GitHub code search (secret leaks)
 │   └── dns_resolver.py  DNS A-record resolution of discovered hosts + 20 common prefixes
@@ -246,7 +246,7 @@ reconmap scan example.com
    │
    ▼
 Scanner.run(domain)
-   ├──► CertStreamCollector  ──┐
+   ├──► CrtShCollector  ──┐
    ├──► ShodanCollector       ├──► AssetSnapshot (merged)
    ├──► GitHubCollector       ┘
    └──► DNSResolverCollector ──► Enrich subdomains with IPs

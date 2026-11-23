@@ -2,7 +2,7 @@ import asyncio
 import logging
 
 from reconmap.collectors.base import BaseCollector
-from reconmap.collectors.certstream import CertStreamCollector
+from reconmap.collectors.crtsh import CrtShCollector
 from reconmap.collectors.shodan import ShodanCollector
 from reconmap.collectors.github import GitHubCollector
 from reconmap.collectors.dns_resolver import DNSResolverCollector
@@ -24,7 +24,7 @@ class Scanner:
             self._collectors = collectors
         else:
             self._collectors = [
-                CertStreamCollector(),
+                CrtShCollector(),
                 ShodanCollector(),
                 GitHubCollector(token=github_token),
                 DNSResolverCollector(),
@@ -32,7 +32,7 @@ class Scanner:
 
     async def run(self, domain: str) -> AssetSnapshot:
         """Run all collectors and merge results into a single AssetSnapshot."""
-        # Step 1: Run CertStream + Shodan + GitHub concurrently
+        # Step 1: Run crt.sh + Shodan + GitHub concurrently
         passive_collectors = [c for c in self._collectors if not isinstance(c, DNSResolverCollector)]
         dns_collectors = [c for c in self._collectors if isinstance(c, DNSResolverCollector)]
 

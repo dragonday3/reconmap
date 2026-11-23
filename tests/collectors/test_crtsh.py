@@ -1,9 +1,9 @@
-"""Tests for CertStreamCollector (crt.sh CT log queries)."""
+"""Tests for CrtShCollector (crt.sh CT log queries)."""
 import pytest
 import respx
 import httpx
 
-from reconmap.collectors.certstream import CertStreamCollector
+from reconmap.collectors.crtsh import CrtShCollector
 
 # ---------------------------------------------------------------------------
 # Shared fixture data
@@ -36,7 +36,7 @@ async def test_normal_response_extracts_subdomains():
     respx.get(url__regex=CRT_URL_PATTERN).mock(
         return_value=httpx.Response(200, json=CRTSH_RESPONSE)
     )
-    collector = CertStreamCollector()
+    collector = CrtShCollector()
     snapshot = await collector.collect("example.com")
 
     names = {s.subdomain for s in snapshot.subdomains}
@@ -57,7 +57,7 @@ async def test_wildcard_stripped():
     respx.get(url__regex=CRT_URL_PATTERN).mock(
         return_value=httpx.Response(200, json=data)
     )
-    collector = CertStreamCollector()
+    collector = CrtShCollector()
     snapshot = await collector.collect("example.com")
 
     names = {s.subdomain for s in snapshot.subdomains}
@@ -81,7 +81,7 @@ async def test_multiline_name_value_both_extracted():
     respx.get(url__regex=CRT_URL_PATTERN).mock(
         return_value=httpx.Response(200, json=data)
     )
-    collector = CertStreamCollector()
+    collector = CrtShCollector()
     snapshot = await collector.collect("example.com")
 
     names = {s.subdomain for s in snapshot.subdomains}
@@ -102,7 +102,7 @@ async def test_non_matching_domains_filtered():
     respx.get(url__regex=CRT_URL_PATTERN).mock(
         return_value=httpx.Response(200, json=data)
     )
-    collector = CertStreamCollector()
+    collector = CrtShCollector()
     snapshot = await collector.collect("example.com")
 
     names = {s.subdomain for s in snapshot.subdomains}
@@ -124,7 +124,7 @@ async def test_duplicate_subdomain_dedup_with_correct_dates():
     respx.get(url__regex=CRT_URL_PATTERN).mock(
         return_value=httpx.Response(200, json=data)
     )
-    collector = CertStreamCollector()
+    collector = CrtShCollector()
     snapshot = await collector.collect("example.com")
 
     api_subs = [s for s in snapshot.subdomains if s.subdomain == "api.example.com"]
@@ -145,7 +145,7 @@ async def test_http_500_returns_empty_snapshot():
     respx.get(url__regex=CRT_URL_PATTERN).mock(
         return_value=httpx.Response(500)
     )
-    collector = CertStreamCollector()
+    collector = CrtShCollector()
     snapshot = await collector.collect("example.com")
 
     assert snapshot.target_domain == "example.com"
@@ -163,7 +163,7 @@ async def test_timeout_returns_empty_snapshot():
     respx.get(url__regex=CRT_URL_PATTERN).mock(
         side_effect=httpx.TimeoutException("timeout")
     )
-    collector = CertStreamCollector()
+    collector = CrtShCollector()
     snapshot = await collector.collect("example.com")
 
     assert snapshot.target_domain == "example.com"
@@ -175,7 +175,7 @@ async def test_timeout_returns_empty_snapshot():
 # ---------------------------------------------------------------------------
 
 def test_is_available_returns_true():
-    collector = CertStreamCollector()
+    collector = CrtShCollector()
     assert collector.is_available() is True
 
 
@@ -184,7 +184,7 @@ def test_is_available_returns_true():
 # ---------------------------------------------------------------------------
 
 def test_requires_key_is_false():
-    assert CertStreamCollector.requires_key is False
+    assert CrtShCollector.requires_key is False
 
 
 # ---------------------------------------------------------------------------
@@ -196,7 +196,7 @@ async def test_empty_json_array_returns_empty_snapshot():
     respx.get(url__regex=CRT_URL_PATTERN).mock(
         return_value=httpx.Response(200, json=[])
     )
-    collector = CertStreamCollector()
+    collector = CrtShCollector()
     snapshot = await collector.collect("example.com")
 
     assert snapshot.target_domain == "example.com"
@@ -213,7 +213,7 @@ async def test_domain_itself_included():
     respx.get(url__regex=CRT_URL_PATTERN).mock(
         return_value=httpx.Response(200, json=data)
     )
-    collector = CertStreamCollector()
+    collector = CrtShCollector()
     snapshot = await collector.collect("example.com")
 
     names = {s.subdomain for s in snapshot.subdomains}
@@ -221,20 +221,20 @@ async def test_domain_itself_included():
 
 
 # ---------------------------------------------------------------------------
-# Test 12 — source field on returned Subdomain objects is "certstream"
+# Test 12 — source field on returned Subdomain objects is "crtsh"
 # ---------------------------------------------------------------------------
 
 @respx.mock
-async def test_subdomain_source_is_certstream():
+async def test_subdomain_source_is_crtsh():
     data = [{"name_value": "dev.example.com", "not_before": "2024-01-01T00:00:00"}]
     respx.get(url__regex=CRT_URL_PATTERN).mock(
         return_value=httpx.Response(200, json=data)
     )
-    collector = CertStreamCollector()
+    collector = CrtShCollector()
     snapshot = await collector.collect("example.com")
 
     assert len(snapshot.subdomains) == 1
-    assert snapshot.subdomains[0].source == "certstream"
+    assert snapshot.subdomains[0].source == "crtsh"
 
 
 # ---------------------------------------------------------------------------
@@ -242,4 +242,4 @@ async def test_subdomain_source_is_certstream():
 # ---------------------------------------------------------------------------
 
 def test_collector_name():
-    assert CertStreamCollector.name == "certstream"
+    assert CrtShCollector.name == "crtsh"

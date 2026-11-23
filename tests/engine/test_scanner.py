@@ -5,7 +5,7 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from reconmap.collectors.certstream import CertStreamCollector
+from reconmap.collectors.crtsh import CrtShCollector
 from reconmap.collectors.shodan import ShodanCollector
 from reconmap.collectors.github import GitHubCollector
 from reconmap.collectors.dns_resolver import DNSResolverCollector
@@ -55,9 +55,9 @@ def make_leak(
     )
 
 
-def make_passive_collector(snapshot: AssetSnapshot) -> CertStreamCollector:
-    """Return a real CertStreamCollector instance with a mocked collect method."""
-    collector = CertStreamCollector()
+def make_passive_collector(snapshot: AssetSnapshot) -> CrtShCollector:
+    """Return a real CrtShCollector instance with a mocked collect method."""
+    collector = CrtShCollector()
     collector.collect = AsyncMock(return_value=snapshot)
     return collector
 
@@ -89,7 +89,7 @@ class TestScannerDefaultCollectors:
     def test_default_collectors_types(self):
         scanner = Scanner()
         types = [type(c) for c in scanner._collectors]
-        assert CertStreamCollector in types
+        assert CrtShCollector in types
         assert ShodanCollector in types
         assert GitHubCollector in types
         assert DNSResolverCollector in types
@@ -160,7 +160,7 @@ class TestSubdomainDeduplication:
     async def test_same_subdomain_from_two_collectors_deduped(self):
         snap1 = AssetSnapshot(
             target_domain="example.com",
-            subdomains=[make_subdomain("api.example.com", source="certstream")],
+            subdomains=[make_subdomain("api.example.com", source="crtsh")],
         )
         snap2 = AssetSnapshot(
             target_domain="example.com",
@@ -310,7 +310,7 @@ class TestDNSCollectorReceivesMergedSubdomains:
 
     @pytest.mark.asyncio
     async def test_dns_collector_receives_merged_subdomains(self):
-        sub1 = make_subdomain("www.example.com", source="certstream")
+        sub1 = make_subdomain("www.example.com", source="crtsh")
         sub2 = make_subdomain("api.example.com", source="shodan")
 
         passive_snap = AssetSnapshot(target_domain="example.com", subdomains=[sub1])

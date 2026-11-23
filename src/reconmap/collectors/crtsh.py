@@ -10,8 +10,8 @@ from reconmap.models.asset import AssetSnapshot, Subdomain
 logger = logging.getLogger(__name__)
 
 
-class CertStreamCollector(BaseCollector):
-    name = "certstream"
+class CrtShCollector(BaseCollector):
+    name = "crtsh"
     requires_key = False
 
     async def collect(self, domain: str) -> AssetSnapshot:

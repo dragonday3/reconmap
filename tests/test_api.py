@@ -179,7 +179,7 @@ async def test_scan_twice_produces_changes(client):
             Subdomain(
                 target_domain="example.com",
                 subdomain="api.example.com",
-                source="certstream",
+                source="crtsh",
             )
         ],
     )
@@ -189,12 +189,12 @@ async def test_scan_twice_produces_changes(client):
             Subdomain(
                 target_domain="example.com",
                 subdomain="api.example.com",
-                source="certstream",
+                source="crtsh",
             ),
             Subdomain(
                 target_domain="example.com",
                 subdomain="new.example.com",
-                source="certstream",
+                source="crtsh",
             ),
         ],
     )

@@ -30,7 +30,7 @@ def make_subdomain(**kwargs) -> Subdomain:
         "target_domain": "example.com",
         "subdomain": "api.example.com",
         "ip_addresses": ["1.2.3.4"],
-        "source": "certstream",
+        "source": "crtsh",
     }
     defaults.update(kwargs)
     return Subdomain(**defaults)

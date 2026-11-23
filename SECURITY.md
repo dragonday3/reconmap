@@ -10,7 +10,10 @@
 
 **Do not open a public GitHub issue for security vulnerabilities.**
 
-Report security issues privately to: **dragon.day33@gmail.com**
+Report security issues privately through GitHub's private vulnerability reporting:
+**[Report a vulnerability](https://github.com/dragonday3/reconmap/security/advisories/new)** (Security tab → *Report a vulnerability*).
+
+Only the maintainer can see the report.
 
 Include in your report:
 - Description of the vulnerability
@@ -30,4 +33,4 @@ Security reports are welcome for:
 
 ## Responsible Use
 
-reconmap performs **fully passive** reconnaissance only — it queries public data sources and does not actively probe targets. Even so, use it only against domains you own or have **explicit written authorization** to monitor. The maintainers are not responsible for unauthorized use of this software.
+reconmap is **passive-first**: crt.sh, Shodan InternetDB and GitHub search never touch the target, and the only direct traffic is ordinary DNS lookups (including 20 common subdomain guesses, skippable with `--no-dns`). It performs no port scanning or HTTP probing. Even so, use it only against domains you own or have **explicit written authorization** to monitor. The maintainers are not responsible for unauthorized use of this software.
