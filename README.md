@@ -8,6 +8,10 @@
 
 Run it on a schedule (cron, or a scheduled GitHub Actions workflow) to monitor a domain over time; see [Scheduled monitoring](#scheduled-monitoring).
 
+![reconmap HTML report for example.com: subdomains, open ports, secret leaks and changes](assets/reconmap-report.png)
+
+<sub>HTML report from `reconmap scan example.com --output html` (crt.sh was unavailable during this run, so subdomains come from DNS only).</sub>
+
 ---
 
 ## Install
